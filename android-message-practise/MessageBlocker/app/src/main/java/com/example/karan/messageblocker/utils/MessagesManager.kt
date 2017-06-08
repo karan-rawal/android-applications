@@ -26,7 +26,7 @@ class MessagesManager(private var contentResolver: ContentResolver) {
      * To get all the conversations.
      */
     fun getConversations(): List<Conversation> {
-        val listOfConversations = listOf<Conversation>()
+        var listOfConversations = listOf<Conversation>()
         val messageUri = Uri.parse("content://sms/conversations")
         val c = this.contentResolver.query(messageUri, null, null, null, null)
 
@@ -40,9 +40,15 @@ class MessagesManager(private var contentResolver: ContentResolver) {
             val thread_id = c.getInt(c.getColumnIndex("thread_id"))
             val msg_count = c.getInt(c.getColumnIndex("msg_count"))
             val snippet = c.getString(c.getColumnIndex("snippet"))
-            val conversation = Conversation(msg_count, thread_id, snippet)
-            getSmsForThread(conversation.thread_id)
-            listOfConversations.plus(conversation)
+
+            var smsList = getSmsForThread(thread_id)
+
+            if (smsList.size > 0) {
+                //take the first item of the sms, for address.
+                val conversation = Conversation(msg_count, thread_id, snippet, smsList.get(0).address)
+                listOfConversations = listOfConversations.plus(conversation)
+            }
+
             c.moveToNext()
         }
 
@@ -55,7 +61,7 @@ class MessagesManager(private var contentResolver: ContentResolver) {
      */
     fun getSmsForThread(threadId: Int): List<Sms> {
 
-        val listOfSms = listOf<Sms>()
+        var listOfSms = listOf<Sms>()
         val messageUri = Uri.parse("content://sms/")
         val c = this.contentResolver.query(messageUri, null, "thread_id = ?", arrayOf(threadId.toString()), null)
 
@@ -71,7 +77,9 @@ class MessagesManager(private var contentResolver: ContentResolver) {
             val thread_id = c.getInt(c.getColumnIndex("thread_id"))
             val type = c.getInt(c.getColumnIndex("type"))
             val sms = Sms(_id, thread_id, address, body, type)
-            listOfSms.plus(sms)
+
+            listOfSms = listOfSms.plus(sms)
+
             c.moveToNext()
         }
 
