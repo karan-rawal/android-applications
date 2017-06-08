@@ -22,10 +22,12 @@ class InboxAdapter constructor(var conversations: List<Conversation>) : Recycler
 
         var tvContact: TextView? = null
         var cbIsSelected: CheckBox? = null
+        var tvSnippet: TextView? = null
 
         init {
             tvContact = view.findViewById(R.id.tvContact) as TextView
             cbIsSelected = view.findViewById(R.id.cbIsSelected) as CheckBox
+            tvSnippet = view.findViewById(R.id.tvSnippet) as TextView
         }
 
     }
@@ -34,8 +36,9 @@ class InboxAdapter constructor(var conversations: List<Conversation>) : Recycler
      * Fill the views in the view holder.
      */
     override fun onBindViewHolder(holder: InboxViewHolder?, position: Int) {
-        val sms = conversations[position]
-        holder!!.tvContact!!.text = sms.address
+        val conversation = conversations[position]
+        holder!!.tvContact!!.text = conversation.address
+        holder!!.tvSnippet!!.text = conversation.snippet
     }
 
     /**
